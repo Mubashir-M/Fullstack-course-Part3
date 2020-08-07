@@ -2,8 +2,11 @@ const express = require('express')
 const { response, json } = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
 
+    
     app.use(express.json())
+    app.use(cors())
 
     morgan.token("data",(req,res) =>{
         return JSON.stringify({
@@ -101,7 +104,7 @@ app.post('/api/persons', (req,res) => {
 app.delete('/api/persons/:id',(req,res) => {
     const id = Number(req.params.id)
     contacts = contacts.filter(contact => contact.id !== id)
-    res.status(404).end()
+    res.status(404).end('Deleted conctact successfully')
 })
 
 
@@ -110,7 +113,7 @@ app.delete('/api/persons/:id',(req,res) => {
 
 
 
-  const PORT = 3001
+  const PORT = process.env.PORT || 3001
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })

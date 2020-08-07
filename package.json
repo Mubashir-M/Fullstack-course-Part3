@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/Mubashir-M/Fullstack-course-Part3#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "heroku-cli": "^7.0.9",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
