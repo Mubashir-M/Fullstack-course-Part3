@@ -56,10 +56,12 @@ app.get('/api/persons', (req, res) => {
 
   // following method counts from contats not database
 app.get('/info', (req,res) => {
-    const count = contacts.length
     const date = new Date()
-    console.log('count and date',count,date)
-    res.send(`<p>Phonebook has info for ${count} people<br>${date}}</p>`)
+
+    Note.find({}).then(notes => {
+        res.send(`<p>Phonebook has info for ${notes.length} people<br>${date}}</p>`)
+      })
+    
 })
 
 app.get('/api/persons/:id',(req,res) => {
