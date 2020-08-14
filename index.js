@@ -1,9 +1,11 @@
-//testing
+require('dotenv').config()
 const express = require('express')
 const { response, json } = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+const Note = require('./models/note')
+
 
     app.use(express.static('build'))
     app.use(express.json())
@@ -18,8 +20,6 @@ const cors = require('cors')
     
     app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
     
-    
-  
 
 let contacts = [
     {
@@ -49,9 +49,12 @@ let contacts = [
 ]
 
 app.get('/api/persons', (req, res) => {
-    res.json(contacts)
+    Note.find({}).then(notes => {
+        res.json(notes.map(note => note.toJSON()))
+      })
   })
 
+  // following method counts from contats not database
 app.get('/info', (req,res) => {
     const count = contacts.length
     const date = new Date()
@@ -60,19 +63,15 @@ app.get('/info', (req,res) => {
 })
 
 app.get('/api/persons/:id',(req,res) => {
-    const id = Number (req.params.id)
-    const contact = contacts.find(contact => contact.id === id)
-
-    if (contact) {
-        res.json(contact)
-    } else {
-        res.status(404).end()
-    }
+    
+    Note.findById(req.params.id).then(note => {
+        res.json(note.toJSON())
+      })
+      
 })
 
 
 app.post('/api/persons', (req,res) => {
-    const GeneratedId = Math.floor(Math.random() * 100000);
     const body = req.body
 
     if (!body.name) {
@@ -89,16 +88,20 @@ app.post('/api/persons', (req,res) => {
         return res.status(400).json({
             error: 'name must be unique'
         })
+    } else  {
+
+        const note = new Note({
+            name:body.name,
+            number: body.number,
+        })
+    
+        note.save().then(savedNote => {
+            res.json(savedNote.toJSON())
+          })
+
     }
 
-    const contact = {
-        name:body.name,
-        number: body.number,
-        id : GeneratedId
-    }
-
-    contacts = contacts.concat(contact)
-    res.json(contact)
+    
 
 })
 
@@ -110,11 +113,7 @@ app.delete('/api/persons/:id',(req,res) => {
 
 
 
-
-
-
-
-  const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })
