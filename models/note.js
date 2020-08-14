@@ -4,6 +4,7 @@ const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
 
+//had to add String() around url otherwise heroku link application wouldn't work
 mongoose.connect(String(url), { useNewUrlParser: true, useUnifiedTopology: true })
   .then(result => {
     console.log('connected to MongoDB')
