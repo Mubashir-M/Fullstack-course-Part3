@@ -54,7 +54,7 @@ app.get('/api/persons', (req, res) => {
       })
   })
 
-  // following method counts from contats not database
+  
 app.get('/info', (req,res) => {
     const date = new Date()
 
