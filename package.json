@@ -30,6 +30,7 @@
     "mongoose": "^5.9.28",
     "morgan": "^1.10.0"
   },
+  "proxy": "http://localhost:3001",
   "devDependencies": {
     "nodemon": "^2.0.4"
   }
