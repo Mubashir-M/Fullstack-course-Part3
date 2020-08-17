@@ -67,6 +67,7 @@ app.get('/info', (req,res) => {
 app.get('/api/persons/:id',(req,res,next) => {
     
     Note.findById(req.params.id).then(note => {
+        
         if (note) {
             res.json(note)
           } else {
@@ -78,24 +79,8 @@ app.get('/api/persons/:id',(req,res,next) => {
 })
 
 
-app.post('/api/persons', (req,res) => {
+app.post('/api/persons', (req,res,next) => {
     const body = req.body
-
-    if (!body.name) {
-        return res.status(400).json({
-            error: 'name missing'
-        })
-    }
-    else if (!body.number) {
-        return res.status(400).json({
-            error: 'number missing'
-        })
-    }
-    else if (contacts.filter(contact => contact.name.toLowerCase() === body.name.toLowerCase()).length>0){
-        return res.status(400).json({
-            error: 'name must be unique'
-        })
-    } else  {
 
         const note = new Note({
             name:body.name,
@@ -105,11 +90,7 @@ app.post('/api/persons', (req,res) => {
         note.save().then(savedNote => {
             res.json(savedNote.toJSON())
           })
-
-    }
-
-    
-
+          .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id',(req,res,next) => {
@@ -134,8 +115,37 @@ app.put('/api/persons/:id', (req, res, next) => {
         res.json(updatedNote.toJSON())
       })
       .catch(error => next(error))
-  })
 
+      /*Note.findOneAndUpdate({id: req.params.id}, {number: note.number} ,{runValidators: true}, {new: true}, function(err,result){
+        if (err){
+          next(err)
+        } else {
+          console.log('here is object result:')
+          res.json(result.toJSON())
+        }
+      } )*/
+      
+    })
+
+  const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' })
+  }
+  
+  app.use(unknownEndpoint)
+  
+  const errorHandler = (error, req, res, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError' && error.kind == 'ObjectId') {
+      return res.status(400).send({ error: 'malformatted id' })
+    }   else if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message })
+    }
+  
+    next(error)
+  }
+  
+  app.use(errorHandler)
 
 
 const PORT = process.env.PORT

@@ -1,11 +1,13 @@
 
 const mongoose = require('mongoose')
+const uniqueValidator = require ('mongoose-unique-validator')
 const url = process.env.MONGODB_URI
-
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 console.log('connecting to', url)
 
 //had to add String() around url otherwise heroku link application wouldn't work
-mongoose.connect(String(url), { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(String(url), { useNewUrlParser: true, useUnifiedTopology: true})
   .then(result => {
     console.log('connected to MongoDB')
   })
@@ -15,9 +17,22 @@ mongoose.connect(String(url), { useNewUrlParser: true, useUnifiedTopology: true 
 
 
 const noteSchema = new mongoose.Schema({
-name: String,
-number: String,
+name: {
+    type: String,
+    required: true,
+    minlength: 3,
+    unique: true
+
+},
+number: {
+    type: String,
+    required: true,
+    minlength: 8,
+    unique: true
+},
 })
+
+noteSchema.plugin(uniqueValidator)
 
 noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
