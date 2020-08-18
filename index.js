@@ -1,6 +1,6 @@
 require('dotenv').config()
 const express = require('express')
-const { response, json } = require('express')
+const { response, json, query } = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
@@ -103,28 +103,21 @@ app.delete('/api/persons/:id',(req,res,next) => {
 
 app.put('/api/persons/:id', (req, res, next) => {
     const body = req.body
-    console.log(body)
+    console.log('here is req.params.id:' ,req.params.id)
+   //console.log('objectid is: ',Note.mongoose.Types.objectId(req.params.id))
 
     const note = {
       name: body.name,
       number: body.number,
     }
   
-    Note.findByIdAndUpdate(req.params.id, note)
+    Note.findByIdAndUpdate(req.params.id, note,{runValidators:true, context: 'query'})
       .then(updatedNote => {
         res.json(updatedNote.toJSON())
       })
       .catch(error => next(error))
 
-      /*Note.findOneAndUpdate({id: req.params.id}, {number: note.number} ,{runValidators: true}, {new: true}, function(err,result){
-        if (err){
-          next(err)
-        } else {
-          console.log('here is object result:')
-          res.json(result.toJSON())
-        }
-      } )*/
-      
+     
     })
 
   const unknownEndpoint = (req, res) => {
